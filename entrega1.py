@@ -1,3 +1,4 @@
+from ctypes import cdll
 from simpleai.search import (
     SearchProblem,
     breadth_first,
@@ -13,11 +14,12 @@ from simpleai.search import (
 # - Segunda tupla (Lista de las posiciones actuales de las cajas en el mapa)
 # - Tercera tupla lista inicialmente vacia (iremos almacenando y sacando las cajas de la lista a medida que se encuentren en su posición)
 # - La cantidad maxima de mivimientos
+
 initial = (
 
-    (4, 5),
-    ((2, 3), (3, 4), (4, 4), (6, 1), (6, 3), (6, 4), (6, 5)),
-    (),
+    (4, 4),
+    ((2, 3), (3, 4), (6, 1), (6, 3), (6, 4), (6, 5)),
+    ((5, 4),),
     50
 
 )
@@ -55,32 +57,32 @@ class Socoban(SearchProblem):
 
         #   Arriba
         if (pos_fila - 1, pos_columna) not in obstaculos: # Pregunto si hay un obstaculo
-            if (pos_fila - 1, pos_columna) in lista_pos_cajas: # Pregunto si hay una caja
-                if (pos_fila - 2, pos_columna) not in obstaculos: # Pregunto si detras de la caja hay un obstaculo
+            if ((pos_fila - 1, pos_columna) in lista_pos_cajas) or ((pos_fila - 1, pos_columna) in lista_resultado): # Pregunto si hay una caja
+                if ((pos_fila - 2, pos_columna) not in obstaculos) and ((pos_fila - 2, pos_columna) not in lista_pos_cajas) and ((pos_fila - 2, pos_columna) not in lista_resultado): # Pregunto si detras de la caja hay un obstaculo o caja
                     lista_acciones.append(('E', 'Arriba', (pos_fila - 1, pos_columna)))
             else:
                 lista_acciones.append(('M','Arriba'))
 
         #   Abajo
         if (pos_fila + 1, pos_columna) not in obstaculos:
-            if (pos_fila + 1, pos_columna) in lista_pos_cajas:
-                if (pos_fila + 2, pos_columna) not in obstaculos:
+            if ((pos_fila + 1, pos_columna) in lista_pos_cajas) or ((pos_fila + 1, pos_columna) in lista_resultado):
+                if ((pos_fila + 2, pos_columna) not in obstaculos) and ((pos_fila + 2, pos_columna) not in lista_pos_cajas) and ((pos_fila + 2, pos_columna) not in lista_resultado):
                     lista_acciones.append(('E', 'Abajo', (pos_fila + 1, pos_columna)))
             else:
                 lista_acciones.append(('M','Abajo'))
 
         #   Izquierda
         if (pos_fila, pos_columna - 1) not in obstaculos:
-            if (pos_fila, pos_columna - 1) in lista_pos_cajas:
-                if (pos_fila, pos_columna - 2) not in obstaculos:
+            if ((pos_fila, pos_columna - 1) in lista_pos_cajas) or ((pos_fila, pos_columna - 1) in lista_resultado):
+                if ((pos_fila, pos_columna - 2) not in obstaculos) and ((pos_fila, pos_columna - 2) not in lista_pos_cajas) and ((pos_fila, pos_columna - 2) not in lista_resultado):
                     lista_acciones.append(('E', 'Izquierda', (pos_fila, pos_columna - 1)))
             else:
                 lista_acciones.append(('M','Izquierda'))
 
         #   Derecha
         if (pos_fila, pos_columna + 1) not in obstaculos:
-            if (pos_fila, pos_columna + 1) in lista_pos_cajas:
-                if (pos_fila, pos_columna + 2) not in obstaculos:
+            if ((pos_fila, pos_columna + 1) in lista_pos_cajas) or ((pos_fila, pos_columna + 1) in lista_resultado):
+                if ((pos_fila, pos_columna + 2) not in obstaculos) and ((pos_fila, pos_columna + 2) not in lista_pos_cajas) and ((pos_fila, pos_columna + 2) not in lista_resultado):
                     lista_acciones.append(('E', 'Derecha', (pos_fila, pos_columna + 1)))
             else:
                 lista_acciones.append(('M','Derecha'))
