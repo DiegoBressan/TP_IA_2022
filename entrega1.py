@@ -9,6 +9,8 @@ from simpleai.search import (
     astar
 )
 
+from simpleai.search.viewers import WebViewer, BaseViewer
+
 #El estado lo representamos con: 
 # - Primera tupla donde guardamos la posición del jugador
 # - Segunda tupla (Lista de las posiciones actuales de las cajas en el mapa)
@@ -91,7 +93,52 @@ class Socoban(SearchProblem):
 
     def result(self, state, action):
         
-        pass
+        posfila, poscolumna = state[0] 
+        listacajas = state[1]
+        listaresultado = state[2]
+        
+        if action[1] == 'Izquierda':
+            posf = posfila
+            posc = poscolumna - 1
+        elif action[1] == 'Derecha':
+            posf = posfila
+            posc = poscolumna + 1
+        elif action[1] == 'Arriba':
+            posf = posfila - 1
+            posc = poscolumna
+        elif action[1] == 'Abajo':
+            posf = posfila + 1
+            posc = poscolumna
+
+        if action[0] == 'E':
+            
+            aux = action[2]
+            
+            if action[1] == 'Izquierda':
+                aux[1] -= 1
+            elif action[1] == 'Derecha':
+                aux[1] += 1
+            elif action[1] == 'Arriba':
+                aux[0] -= 1
+            elif action[1] == 'Abajo':
+                aux[0] += 1
+
+
+            if action[2] in listaresultado:             
+                listaresultado.remove(action[2])
+                listacajas.append(aux)
+            elif action[2] in objetivos:
+                listacajas.remove(action[2])
+                listaresultado.append(aux)
+            else:
+                listacajas.remove(action[2])
+                listacajas.append(action[2])
+   
+        state[0] = posf, posc
+        state[1] = listacajas
+        state[2] = listaresultado
+        
+        return(state)
 
     def heuristic(self, state):
 
@@ -104,9 +151,9 @@ class Socoban(SearchProblem):
 #  problem.actions(initial)
 #------------------------------------
 
-#viewer = WebViewer()
+viewer = WebViewer()
 
-#result = astar(Socoban(initial),viewer=viewer)
+result = breadth_first(Socoban(initial),viewer=viewer)
 
 #print("Estado meta:")
 #print(result.state)
