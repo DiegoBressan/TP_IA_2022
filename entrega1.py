@@ -14,14 +14,14 @@ from simpleai.search.viewers import WebViewer, BaseViewer
 #El estado lo representamos con: 
 # - Primera tupla donde guardamos la posición del jugador
 # - Segunda tupla (Lista de las posiciones actuales de las cajas en el mapa)
-# - Tercera tupla lista inicialmente vacia (iremos almacenando y sacando las cajas de la lista a medida que se encuentren en su posición)
-# - La cantidad maxima de mivimientos
+# - Tercera tupla lista inicialmente vacia (listaresultado: iremos almacenando y sacando las cajas de la lista a medida que se encuentren en su posición)
+# - Cuarta posicion: La cantidad maxima de movimientos
 
 initial = (
 
-    (4, 4),
-    ((2, 3), (3, 4), (6, 1), (6, 3), (6, 4), (6, 5)),
-    ((5, 4),),
+    (2, 2),
+    ((2, 3), (3, 4), (4, 4), (6, 1), (6, 3), (6, 4), (6, 5)),
+    (),
     50
 
 )
@@ -49,7 +49,7 @@ class Socoban(SearchProblem):
             return True 
 
     def actions(self, state):
-        pos_jugador, lista_pos_cajas, lista_resultado, max_mov = state
+        pos_jugador, lista_pos_cajas, lista_resultado, _ = state
         pos_fila = pos_jugador[0]
         pos_columna = pos_jugador[1]
 
@@ -94,25 +94,35 @@ class Socoban(SearchProblem):
     def result(self, state, action):
         
         posfila, poscolumna = state[0] 
-        listacajas = state[1]
-        listaresultado = state[2]
+        listacajas1 = state[1]
+        listaresultado1 = state[2]
+        movimientos = state[3]
+
+        listacajas = [list(fila) for fila in listacajas1]
+        listaresultado = [list(fila) for fila in listaresultado1]
+
         
         if action[1] == 'Izquierda':
             posf = posfila
             posc = poscolumna - 1
+            movimientos -= 1
         elif action[1] == 'Derecha':
             posf = posfila
             posc = poscolumna + 1
+            movimientos -= 1
         elif action[1] == 'Arriba':
             posf = posfila - 1
             posc = poscolumna
+            movimientos -= 1
         elif action[1] == 'Abajo':
             posf = posfila + 1
             posc = poscolumna
+            movimientos -= 1
 
         if action[0] == 'E':
             
-            aux = action[2]
+            aux1 = action[2]
+            aux = list(aux1)
             
             if action[1] == 'Izquierda':
                 aux[1] -= 1
@@ -123,22 +133,29 @@ class Socoban(SearchProblem):
             elif action[1] == 'Abajo':
                 aux[0] += 1
 
-
-            if action[2] in listaresultado:             
-                listaresultado.remove(action[2])
-                listacajas.append(aux)
-            elif action[2] in objetivos:
-                listacajas.remove(action[2])
-                listaresultado.append(aux)
-            else:
-                listacajas.remove(action[2])
-                listacajas.append(action[2])
+            # Si hay que mover una caja que esta en la posicion correcta, se saca de la listaresultado y se devuelve a la listacajas
+            for tupla in listaresultado:
+                if  tupla == action[2]:           
+                    listaresultado.remove(tupla)
+                    listacajas.append(aux)
+            # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
+            for tupla in objetivos:
+                if tupla == action[2]:
+                    listacajas.remove(tupla)
+                    listaresultado.append(aux)
+            # Si hay que mover la caja a una posicion cualquiera
+            for tupla in listacajas:
+                if tupla == action[2]:
+                    listacajas.remove(tupla)
+                    listacajas.append(aux)
    
-        state[0] = posf, posc
-        state[1] = listacajas
-        state[2] = listaresultado
+        listaresultado_devolver = tuple(tuple(fila) for fila in listaresultado)
+        listacajas_devolver = tuple(tuple(fila) for fila in listacajas)
         
-        return(state)
+        return((posf, posc), listacajas_devolver, listaresultado_devolver, movimientos)
+
+    # Hay un error en los movimientos, no los lleva bien
+    # Hay un error en la accion empujar, no empuja la caja
 
     def heuristic(self, state):
 
