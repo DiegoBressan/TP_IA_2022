@@ -1,4 +1,3 @@
-from ctypes import cdll
 from simpleai.search import (
     SearchProblem,
     breadth_first,
@@ -18,13 +17,18 @@ from simpleai.search.viewers import WebViewer, BaseViewer
 # - Cuarta posicion: La cantidad maxima de movimientos
 
 initial = (
-
     (2, 2),
     ((2, 3), (3, 4), (4, 4), (6, 1), (6, 3), (6, 4), (6, 5)),
     (),
     50
-
 )
+
+#initial = (
+#    (2, 3),
+#    ((2, 2),),
+#    ((3, 5), (4, 1), (5, 4), (6, 3), (7, 4), (6, 6)),
+#    50
+#)
 
 obstaculos = (
 (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (1, 0), (1, 1), (1, 2), (1, 6), 
@@ -37,16 +41,12 @@ objetivos = (
     (2, 1), (3, 5), (4, 1), (5, 4), (6, 3), (7, 4), (6, 6),
 )
 
-from simpleai.search.viewers import WebViewer, BaseViewer
-
 class Socoban(SearchProblem):
-
     def cost(self, state, action, state2):
         return 1
 
     def is_goal(self, state):
-        if (state[1] == () and state[3] >= 0):
-            return True 
+        return (state[1] == () and state[3] >= 0)
 
     def actions(self, state):
         pos_jugador, lista_pos_cajas, lista_resultado, _ = state
@@ -92,37 +92,26 @@ class Socoban(SearchProblem):
         return lista_acciones
 
     def result(self, state, action):
-        
-        posfila, poscolumna = state[0] 
-        listacajas1 = state[1]
-        listaresultado1 = state[2]
-        movimientos = state[3]
-
-        listacajas = [list(fila) for fila in listacajas1]
-        listaresultado = [list(fila) for fila in listaresultado1]
-
+        player, listacajas, listaresultado, movimientos = state
+        state = list(state)
+        state[1] = list(state[1])
+        state[2] = list(state[2])
+        player = list(player)
+        listacajas = [list(fila) for fila in listacajas]
+        listaresultado = [list(fila) for fila in listaresultado]
         
         if action[1] == 'Izquierda':
-            posf = posfila
-            posc = poscolumna - 1
-            movimientos -= 1
+            player[1] -= 1
         elif action[1] == 'Derecha':
-            posf = posfila
-            posc = poscolumna + 1
-            movimientos -= 1
+            player[1] += 1
         elif action[1] == 'Arriba':
-            posf = posfila - 1
-            posc = poscolumna
-            movimientos -= 1
+            player[0] -= 1
         elif action[1] == 'Abajo':
-            posf = posfila + 1
-            posc = poscolumna
-            movimientos -= 1
+            player[0] += 1
 
         if action[0] == 'E':
-            
-            aux1 = action[2]
-            aux = list(aux1)
+            aux = action[2]
+            aux = list(aux)
             
             if action[1] == 'Izquierda':
                 aux[1] -= 1
@@ -134,31 +123,30 @@ class Socoban(SearchProblem):
                 aux[0] += 1
 
             # Si hay que mover una caja que esta en la posicion correcta, se saca de la listaresultado y se devuelve a la listacajas
-            for tupla in listaresultado:
-                if  tupla == action[2]:           
-                    listaresultado.remove(tupla)
-                    listacajas.append(aux)
-            # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
-            for tupla in objetivos:
-                if tupla == action[2]:
-                    listacajas.remove(tupla)
-                    listaresultado.append(aux)
-            # Si hay que mover la caja a una posicion cualquiera
-            for tupla in listacajas:
-                if tupla == action[2]:
-                    listacajas.remove(tupla)
-                    listacajas.append(aux)
-   
-        listaresultado_devolver = tuple(tuple(fila) for fila in listaresultado)
-        listacajas_devolver = tuple(tuple(fila) for fila in listacajas)
+            if action[2] in listaresultado:
+                state[2].remove(action[2])
+                state[1].append(aux)
+            elif action[2] in listacajas: 
+                if aux in objetivos: # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
+                    state[1].remove(action[2])
+                    state[2].append(aux)
+                else: # Si hay que mover la caja a una posicion cualquiera
+                    state[1].remove(action[2])
+                    state[1].append(aux)
         
-        return((posf, posc), listacajas_devolver, listaresultado_devolver, movimientos)
+        movimientos -= 1
+        state[0] = tuple(player)
+        state[1] = tuple(state[1])
+        state[2] = tuple(state[2])
+        state[3] = movimientos
+        state = tuple(state)
+        
+        return state
 
     # Hay un error en los movimientos, no los lleva bien
     # Hay un error en la accion empujar, no empuja la caja
 
     def heuristic(self, state):
-
         pass
 
 #------------------------------------
