@@ -112,6 +112,9 @@ class Socoban(SearchProblem):
         if action[0] == 'E':
             aux = action[2]
             aux = list(aux)
+
+            aux2 = action[2]
+            aux2 = list(aux2)
             
             if action[1] == 'Izquierda':
                 aux[1] -= 1
@@ -123,28 +126,25 @@ class Socoban(SearchProblem):
                 aux[0] += 1
 
             # Si hay que mover una caja que esta en la posicion correcta, se saca de la listaresultado y se devuelve a la listacajas
-            if action[2] in listaresultado:
-                state[2].remove(action[2])
-                state[1].append(aux)
-            elif action[2] in listacajas: 
+            if aux2 in listaresultado:
+                state[2].remove((action[2]))
+                state[1].append((aux))
+            elif aux2 in listacajas: 
                 if aux in objetivos: # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
-                    state[1].remove(action[2])
-                    state[2].append(aux)
+                    state[1].remove((action[2]))
+                    state[2].append((aux))
                 else: # Si hay que mover la caja a una posicion cualquiera
-                    state[1].remove(action[2])
-                    state[1].append(aux)
+                    state[1].remove((action[2]))
+                    state[1].append((aux))
         
         movimientos -= 1
         state[0] = tuple(player)
-        state[1] = tuple(state[1])
-        state[2] = tuple(state[2])
+        state[1] = tuple([tuple(fila) for fila in state[1]])
+        state[2] = tuple([tuple(fila) for fila in state[2]])
         state[3] = movimientos
         state = tuple(state)
         
         return state
-
-    # Hay un error en los movimientos, no los lleva bien
-    # Hay un error en la accion empujar, no empuja la caja
 
     def heuristic(self, state):
         pass
