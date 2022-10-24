@@ -7,11 +7,11 @@ from simpleai.search import (
     MOST_CONSTRAINED_VARIABLE
 )
 
-paredes = 2
+paredes = 3
 cajas = 2
 objetivos = 2
 
-filas = 4
+filas = 3
 columnas = 4
 
 # Consideramos como variables a las paredes cajas y objetivos que debemos colocar
@@ -148,6 +148,53 @@ def Player_con_CajasParedes(variables, values): # Que el player no este en una p
 
 restricciones.append((variables, Player_con_CajasParedes))
 
+def Cajas_en_Objetivos(variables, values):
+    _, cajas, objetivos, _ = Devolver_listas(variables, values)
+    for c in cajas:
+        if c not in objetivos:
+            return True # Si encuentra una caja que no este en objetivo, entonces no todas las cajas estan en objetivos
+    return False # Si no encuentra una caja que no este en objetivo, entonces todas las cajas estan en objetivos
+
+restricciones.append((variables, Cajas_en_Objetivos))
+
+def Caja_no_paredes_adyacentes(variables, values):
+    paredes, cajas, objetivos, _ = Devolver_listas(variables, values)
+    for c in cajas:
+        cont = 0
+
+        # Pregunto si la caja esta pegada a una de las paredes externas 
+        if c[0] == 0:
+            cont += 1
+        if c[1] == 0:
+            cont += 1
+        if c[0] == filas:
+            cont += 1
+        if c[1] == columnas:
+            cont += 1
+        
+        # Pregunto si la caja tiene pegada una de las paredes internas
+        aux = (c[0] - 1, c[1])
+        if aux in paredes:
+            cont += 1
+
+        aux = (c[0] + 1, c[1])
+        if aux in paredes:
+            cont += 1
+
+        aux = (c[0], c[1] - 1)
+        if aux in paredes:
+            cont += 1
+        
+        aux = (c[0], c[1] + 1)
+        if aux in paredes:
+            cont += 1
+
+        if cont >= 2:
+            return False # Si encuentra una caja que tenga 2 o mas paredes, retorna false
+
+    return True # Si no encontro caja con 2 o mas paredes, retorna True
+
+restricciones.append((variables, Caja_no_paredes_adyacentes))
 
 #--------------------------------------------------------
 problema = CspProblem(variables, dominios, restricciones)
