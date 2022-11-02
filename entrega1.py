@@ -32,16 +32,18 @@ from simpleai.search.viewers import WebViewer, BaseViewer
 #)
 
 def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
+    
     cajas_acomodar = []
     cajas_acomodadas = []
+    
     for x in cajas:
         if x in objetivos:
             cajas_acomodadas.append((x))
         else:
             cajas_acomodar.append((x))
-    
-    cajas_acomodar = list(cajas_acomodar)
-    cajas_acomodadas = list(cajas_acomodadas)
+
+    cajas_acomodar = tuple([tuple(fila) for fila in cajas_acomodar])
+    cajas_acomodadas = tuple([tuple(fila) for fila in cajas_acomodadas])
 
     INITIAL = (
         jugador,
@@ -100,8 +102,7 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                         if ((pos_fila, pos_columna + 2) not in paredes) and ((pos_fila, pos_columna + 2) not in lista_pos_cajas) and ((pos_fila, pos_columna + 2) not in lista_resultado):
                             lista_acciones.append(('E', 'Derecha', (pos_fila, pos_columna + 1)))
                     else:
-                        lista_acciones.append(('M','Derecha'))
-            
+                        lista_acciones.append(('M','Derecha'))            
 
             return lista_acciones
 
@@ -172,18 +173,18 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
     #  problem.actions(initial)
     #------------------------------------
 
-    problema = Socoban(INITIAL)
-    resultado = astar(problema, graph_search=True)
-    #resultado = breadth_first(problema)
     #viewer = WebViewer()
+    problema = Socoban(INITIAL)
+    resultado = astar(problema) #, viewer=viewer)
+    #resultado = breadth_first(problema)
+    
     #resultado = breadth_first(Socoban(INITIAL),viewer=viewer)
 
     #print("Estado meta:")
     #print(resultado.state)
 
     solucion = []
-
-    #print("Path from initial to goal:")
+    print("Path from initial to goal:")
     for action, state in resultado.path():
         if (action is not None):
             solucion.append(action)
@@ -199,10 +200,10 @@ if __name__ == '__main__':
     (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7),
     ]
     objetivo = [
-        (2, 1), (3, 5), (4, 1), (5, 4), (6, 3), (7, 4), (6, 6),
+        (2, 1), (3, 5), 
     ]
     cajas = [
-        ((2, 3), (3, 4), (4, 4), (6, 1), (6, 3), (6, 4), (6, 5))
+        (2, 3), (3, 4), 
     ]
     jugador = (2,2)
     maximos_movimientos = 30
