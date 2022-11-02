@@ -76,33 +76,33 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 if (pos_fila - 1, pos_columna) not in paredes: # Pregunto si hay un obstaculo
                     if ((pos_fila - 1, pos_columna) in lista_pos_cajas) or ((pos_fila - 1, pos_columna) in lista_resultado): # Pregunto si hay una caja
                         if ((pos_fila - 2, pos_columna) not in paredes) and ((pos_fila - 2, pos_columna) not in lista_pos_cajas) and ((pos_fila - 2, pos_columna) not in lista_resultado): # Pregunto si detras de la caja hay un obstaculo o caja
-                            lista_acciones.append(('E', 'Arriba', (pos_fila - 1, pos_columna)))
+                            lista_acciones.append(('E', 'arriba', (pos_fila - 1, pos_columna)))
                     else:
-                        lista_acciones.append(('M','Arriba'))
+                        lista_acciones.append(('M','arriba'))
 
                 #   Abajo
                 if (pos_fila + 1, pos_columna) not in paredes:
                     if ((pos_fila + 1, pos_columna) in lista_pos_cajas) or ((pos_fila + 1, pos_columna) in lista_resultado):
                         if ((pos_fila + 2, pos_columna) not in paredes) and ((pos_fila + 2, pos_columna) not in lista_pos_cajas) and ((pos_fila + 2, pos_columna) not in lista_resultado):
-                            lista_acciones.append(('E', 'Abajo', (pos_fila + 1, pos_columna)))
+                            lista_acciones.append(('E', 'abajo', (pos_fila + 1, pos_columna)))
                     else:
-                        lista_acciones.append(('M','Abajo'))
+                        lista_acciones.append(('M','abajo'))
 
                 #   Izquierda
                 if (pos_fila, pos_columna - 1) not in paredes:
                     if ((pos_fila, pos_columna - 1) in lista_pos_cajas) or ((pos_fila, pos_columna - 1) in lista_resultado):
                         if ((pos_fila, pos_columna - 2) not in paredes) and ((pos_fila, pos_columna - 2) not in lista_pos_cajas) and ((pos_fila, pos_columna - 2) not in lista_resultado):
-                            lista_acciones.append(('E', 'Izquierda', (pos_fila, pos_columna - 1)))
+                            lista_acciones.append(('E', 'izquierda', (pos_fila, pos_columna - 1)))
                     else:
-                        lista_acciones.append(('M','Izquierda'))
+                        lista_acciones.append(('M','izquierda'))
 
                 #   Derecha
                 if (pos_fila, pos_columna + 1) not in paredes:
                     if ((pos_fila, pos_columna + 1) in lista_pos_cajas) or ((pos_fila, pos_columna + 1) in lista_resultado):
                         if ((pos_fila, pos_columna + 2) not in paredes) and ((pos_fila, pos_columna + 2) not in lista_pos_cajas) and ((pos_fila, pos_columna + 2) not in lista_resultado):
-                            lista_acciones.append(('E', 'Derecha', (pos_fila, pos_columna + 1)))
+                            lista_acciones.append(('E', 'derecha', (pos_fila, pos_columna + 1)))
                     else:
-                        lista_acciones.append(('M','Derecha'))            
+                        lista_acciones.append(('M','derecha'))            
 
             return lista_acciones
 
@@ -116,13 +116,13 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
             listaresultado = [list(fila) for fila in listaresultado]
             listaobjetivos = [list(fila) for fila in objetivos]
             
-            if action[1] == 'Izquierda':
+            if action[1] == 'izquierda':
                 player[1] -= 1
-            elif action[1] == 'Derecha':
+            elif action[1] == 'derecha':
                 player[1] += 1
-            elif action[1] == 'Arriba':
+            elif action[1] == 'arriba':
                 player[0] -= 1
-            elif action[1] == 'Abajo':
+            elif action[1] == 'abajo':
                 player[0] += 1
 
             if action[0] == 'E':
@@ -132,13 +132,13 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 aux2 = action[2]
                 aux2 = list(aux2)
                 
-                if action[1] == 'Izquierda':
+                if action[1] == 'izquierda':
                     aux[1] -= 1
-                elif action[1] == 'Derecha':
+                elif action[1] == 'derecha':
                     aux[1] += 1
-                elif action[1] == 'Arriba':
+                elif action[1] == 'arriba':
                     aux[0] -= 1
-                elif action[1] == 'Abajo':
+                elif action[1] == 'abajo':
                     aux[0] += 1
 
                 # Si hay que mover una caja que esta en la posicion correcta, se saca de la listaresultado y se devuelve a la listacajas
@@ -178,11 +178,6 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
     problema = Socoban(INITIAL)
     resultado = astar(problema) #, viewer=viewer)
     #resultado = breadth_first(problema)
-    
-    #resultado = breadth_first(Socoban(INITIAL),viewer=viewer)
-
-    #print("Estado meta:")
-    #print(resultado.state)
 
     solucion = []
     for action, state in resultado.path():
@@ -193,19 +188,10 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
 
 '''
 if __name__ == '__main__':
-    obstaculos = [
-    (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (1, 0), (1, 1), (1, 2), (1, 6), 
-    (2, 0), (2, 6), (3, 0), (3, 1), (3, 2), (3, 6), (4, 0), (4, 2), (4, 3), 
-    (4, 6), (5, 0), (5, 2), (5, 6), (5, 7), (6, 0), (6, 7), (7, 0), (7, 7), 
-    (8, 0), (8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7),
-    ]
-    objetivo = [
-        (2, 1), (3, 5), 
-    ]
-    cajas = [
-        (2, 3), (3, 4), 
-    ]
-    jugador = (2,2)
+    obstaculos = [(4, 0), (4, 3), (4, 6), (0, 2), (0, 5), (1, 0), (1, 6), (4, 2), (3, 0), (4, 5), (3, 6), (0, 1), (0, 4), (4, 1), (4, 4), (0, 0), (0, 3), (2, 0), (0, 6), (2, 6)]
+    cajas = [(2, 3)]
+    objetivo = [(2, 2)]  
+    jugador = (2, 4)
     maximos_movimientos = 30
     
     secuencia = jugar(obstaculos, cajas, objetivo, jugador, maximos_movimientos)

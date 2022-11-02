@@ -86,14 +86,14 @@ def mover(posicion, direccion):
     # @ = caja en objetivo
     # para testear que si el juego ya está ganado, no hay que hacer nada
     pytest.param(("######",
-                  "#   @#"
+                  "#   @#",
                   "# @j #",
-                  "#    #"
+                  "#    #",
                   "######"), 10, 0, 3, id="juego_ganado_no_hacer_nada"),
     pytest.param(("#######",
-                  "#     #"
+                  "#     #",
                   "# oCj #",
-                  "#     #"
+                  "#     #",
                   "#######"), 10, 1, 3, id="1_caja_1_movimiento"),
     pytest.param(("#######",
                   "# o   #",
