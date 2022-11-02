@@ -114,6 +114,7 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
             player = list(player)
             listacajas = [list(fila) for fila in listacajas]
             listaresultado = [list(fila) for fila in listaresultado]
+            listaobjetivos = [list(fila) for fila in objetivos]
             
             if action[1] == 'Izquierda':
                 player[1] -= 1
@@ -145,7 +146,7 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                     state[2].remove((action[2]))
                     state[1].append((aux))
                 elif aux2 in listacajas: 
-                    if aux in objetivos: # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
+                    if aux in listaobjetivos: # Si hay que mover una caja hacia la posicion correcta, se saca de la listacajas y se agrega a la listaresultado
                         state[1].remove((action[2]))
                         state[2].append((aux))
                     else: # Si hay que mover la caja a una posicion cualquiera
@@ -184,10 +185,9 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
     #print(resultado.state)
 
     solucion = []
-    print("Path from initial to goal:")
     for action, state in resultado.path():
         if (action is not None):
-            solucion.append(action)
+            solucion.append(action[1])
 
     return solucion
 
