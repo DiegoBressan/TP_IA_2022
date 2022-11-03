@@ -76,7 +76,15 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 if (pos_fila - 1, pos_columna) not in paredes: # Pregunto si hay un obstaculo
                     if ((pos_fila - 1, pos_columna) in lista_pos_cajas) or ((pos_fila - 1, pos_columna) in lista_resultado): # Pregunto si hay una caja
                         if ((pos_fila - 2, pos_columna) not in paredes) and ((pos_fila - 2, pos_columna) not in lista_pos_cajas) and ((pos_fila - 2, pos_columna) not in lista_resultado): # Pregunto si detras de la caja hay un obstaculo o caja
-                            lista_acciones.append(('E', 'arriba', (pos_fila - 1, pos_columna)))
+                            if (pos_fila - 2, pos_columna) in objetivos: # Pregunta si la posicion es un objetivo
+                                lista_acciones.append(('E', 'arriba', (pos_fila - 1, pos_columna)))
+                            else:
+                                if (pos_fila - 3, pos_columna) not in paredes:
+                                    lista_acciones.append(('E', 'arriba', (pos_fila - 1, pos_columna)))
+                                else:
+                                    if ((pos_fila - 2, pos_columna - 1) not in lista_pos_cajas and (pos_fila - 2, pos_columna - 1) not in lista_resultado) and ((pos_fila - 2, pos_columna + 1) not in lista_pos_cajas and (pos_fila - 2, pos_columna + 1) not in lista_resultado):
+                                        # Pergunta que no tenga paredes, para que no quede en una esquina 
+                                        lista_acciones.append(('E', 'arriba', (pos_fila - 1, pos_columna)))
                     else:
                         lista_acciones.append(('M','arriba'))
 
@@ -84,7 +92,15 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 if (pos_fila + 1, pos_columna) not in paredes:
                     if ((pos_fila + 1, pos_columna) in lista_pos_cajas) or ((pos_fila + 1, pos_columna) in lista_resultado):
                         if ((pos_fila + 2, pos_columna) not in paredes) and ((pos_fila + 2, pos_columna) not in lista_pos_cajas) and ((pos_fila + 2, pos_columna) not in lista_resultado):
-                            lista_acciones.append(('E', 'abajo', (pos_fila + 1, pos_columna)))
+                            if (pos_fila + 2, pos_columna) in objetivos: # Pregunta si la posicion es un objetivo
+                                lista_acciones.append(('E', 'abajo', (pos_fila + 1, pos_columna)))
+                            else:
+                                if (pos_fila + 3, pos_columna) not in paredes:
+                                    lista_acciones.append(('E', 'abajo', (pos_fila + 1, pos_columna)))
+                                else:
+                                    if ((pos_fila + 2, pos_columna - 1) not in lista_pos_cajas and (pos_fila + 2, pos_columna - 1) not in lista_resultado) and ((pos_fila + 2, pos_columna + 1) not in lista_pos_cajas and (pos_fila + 2, pos_columna + 1) not in lista_resultado):
+                                        # Pergunta que no tenga paredes, para que no quede en una esquina 
+                                        lista_acciones.append(('E', 'abajo', (pos_fila + 1, pos_columna)))
                     else:
                         lista_acciones.append(('M','abajo'))
 
@@ -92,7 +108,15 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 if (pos_fila, pos_columna - 1) not in paredes:
                     if ((pos_fila, pos_columna - 1) in lista_pos_cajas) or ((pos_fila, pos_columna - 1) in lista_resultado):
                         if ((pos_fila, pos_columna - 2) not in paredes) and ((pos_fila, pos_columna - 2) not in lista_pos_cajas) and ((pos_fila, pos_columna - 2) not in lista_resultado):
-                            lista_acciones.append(('E', 'izquierda', (pos_fila, pos_columna - 1)))
+                            if (pos_fila, pos_columna - 2) in objetivos: # Pregunta si la posicion es un objetivo
+                                    lista_acciones.append(('E', 'izquierda', (pos_fila, pos_columna - 1)))
+                            else:
+                                if (pos_fila, pos_columna - 3) not in paredes:
+                                    lista_acciones.append(('E', 'izquierda', (pos_fila, pos_columna - 1)))
+                                else:
+                                    if ((pos_fila - 1, pos_columna - 2) not in lista_pos_cajas and (pos_fila - 1, pos_columna - 2) not in lista_resultado) and ((pos_fila + 1, pos_columna - 2) not in lista_pos_cajas and (pos_fila + 1, pos_columna - 2) not in lista_resultado):
+                                        # Pergunta que no tenga paredes, para que no quede en una esquina 
+                                        lista_acciones.append(('E', 'izquierda', (pos_fila, pos_columna - 1)))
                     else:
                         lista_acciones.append(('M','izquierda'))
 
@@ -100,7 +124,15 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
                 if (pos_fila, pos_columna + 1) not in paredes:
                     if ((pos_fila, pos_columna + 1) in lista_pos_cajas) or ((pos_fila, pos_columna + 1) in lista_resultado):
                         if ((pos_fila, pos_columna + 2) not in paredes) and ((pos_fila, pos_columna + 2) not in lista_pos_cajas) and ((pos_fila, pos_columna + 2) not in lista_resultado):
-                            lista_acciones.append(('E', 'derecha', (pos_fila, pos_columna + 1)))
+                            if (pos_fila, pos_columna + 2) in objetivos: # Pregunta si la posicion es un objetivo
+                                    lista_acciones.append(('E', 'derecha', (pos_fila, pos_columna + 1)))
+                            else:
+                                if (pos_fila, pos_columna + 3) not in paredes:
+                                    lista_acciones.append(('E', 'derecha', (pos_fila, pos_columna + 1)))
+                                else:
+                                    if ((pos_fila - 1, pos_columna + 2) not in lista_pos_cajas and (pos_fila - 1, pos_columna + 2) not in lista_resultado) and ((pos_fila + 1, pos_columna + 2) not in lista_pos_cajas and (pos_fila + 1, pos_columna + 2) not in lista_resultado):
+                                        # Pergunta que no tenga paredes, para que no quede en una esquina 
+                                        lista_acciones.append(('E', 'derecha', (pos_fila, pos_columna + 1)))
                     else:
                         lista_acciones.append(('M','derecha'))            
 

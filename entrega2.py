@@ -45,7 +45,7 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
 
     # A cada variable le cargamos en el dominio todas las coordenadas que pueden elegir
     for variable in variables:
-        if  'Caja%' in variable:
+        if variable in lista_cajas:
             lista_grilla1 = []
             for x in range(filas):
                 for y in range(columnas):
