@@ -67,9 +67,10 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
 
     # Genero la lista restricciones y las restricciones
     restricciones = []
-
-    def Paredes_con_Paredes(pared, values): # Que no hayan paredes en la misma posicion
-        if values[pared[0]] != values[pared[1]]:
+    
+    def Paredes_con_Paredes(variables, values): # Que no hayan paredes en la misma posicion
+        p1, p2 = values
+        if p1 != p2:
             return True # Las paredes no estan en la misma posicion
         else:
             return False # Las paredes estan en la misma posicion
@@ -77,8 +78,9 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     for p1, p2 in combinations(lista_paredes, 2):
         restricciones.append(((p1, p2), Paredes_con_Paredes))
     
-    def Cajas_con_cajas(caja, values): # Que no hayan cajas en la misma posicion
-        if values[caja[0]] != values[caja[1]]:
+    def Cajas_con_cajas(variables, values): # Que no hayan cajas en la misma posicion
+        c1, c2 = values
+        if c1 != c2:
             return True # Las cajas no estan en la misma posicion
         else:
             return False # Las cajas estan en la misma posicion
@@ -86,8 +88,9 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     for c1, c2 in combinations(lista_cajas, 2):
         restricciones.append(((c1, c2), Cajas_con_cajas))
 
-    def Objetivos_con_objetivos(objetivo, values): # Que no hayan objetivos en la misma posicion
-        if values[objetivo[0]] != values[objetivo[1]]:
+    def Objetivos_con_objetivos(variables, values): # Que no hayan objetivos en la misma posicion
+        o1, o2 = values
+        if o1 != o2:
             return True # Los objetivos no estan en la misma posicion
         else:
             return False # Los objetivos estan en la misma posicion
@@ -95,8 +98,9 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     for o1, o2 in combinations(lista_objetivos, 2):
         restricciones.append(((o1, o2), Objetivos_con_objetivos))
 
-    def Cajas_con_paredes(caja_pared, values): # Que no hayan cajas en la misma posicion que las paredes
-        if values[caja_pared[0]] == values[caja_pared[1]]:
+    def Cajas_con_paredes(variables, values): # Que no hayan cajas en la misma posicion que las paredes
+        c, p = values
+        if c == p:
             return False # Estan en la misma posicion
         return True # No estan en la misma posicion
 
@@ -104,8 +108,9 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
         for paredsita in lista_paredes:
             restricciones.append(((cajita, paredsita), Cajas_con_paredes))
 
-    def Paredes_con_objetivos(pared_objetivo, values): # Que no hayan Paredes en los objetivos
-        if values[pared_objetivo[0]] == values[pared_objetivo[1]]:
+    def Paredes_con_objetivos(variables, values): # Que no hayan Paredes en los objetivos
+        p, o = values
+        if p == o:
             return False # Estan en la misma posicion
         return True # No estan en la misma posicion
 
@@ -113,75 +118,81 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
         for paredsita in lista_paredes:
             restricciones.append(((paredsita, objetivito), Paredes_con_objetivos))
 
-    def Player_con_CajasParedes(caja_pared, values): # Que el player no este en una pared o una caja
-        if values['Persona'] == values[caja_pared]:
+    def Player_con_CajasParedes(variables, values): # Que el player no este en una pared o una caja
+        p, cp = values
+        if p == cp:
             return False # Estan en la misma posicion
         return True # No estan en la misma posicion
 
     for c in lista_cajas:
-        restricciones.append((c, Player_con_CajasParedes))
+        restricciones.append((('Persona' ,c), Player_con_CajasParedes))
+    
+    for pa in lista_paredes:
+        restricciones.append((('Persona' ,pa), Player_con_CajasParedes))
 
-    def Cajas_en_Objetivos(cajas_objetivos, values):
-        for c in cajas_objetivos[0]:
+        #En esta restriccion tira error y no se porque
+    def Cajas_en_Objetivos(variables, values):
+        for c in lista_cajas:
             ban = True
-            for o in cajas_objetivos[1]:
-                if values[c] == values[o]:
+            for o in lista_objetivos:
+                if c == o:
                     ban = False
                     break
             if ban:
                 return True # Si encuentra una caja que no este en los objetivos, entonces no estan todas las cajas en los objetivos
         return False # Si no encuentra una caja que no este en objetivo, entonces todas las cajas estan en objetivos
 
-    restricciones.append(((lista_cajas, lista_objetivos), Cajas_en_Objetivos))
+    restricciones.append(((0, 1), Cajas_en_Objetivos))
 
-    def Caja_no_paredes_adyacentes(caja_paredes, values):
+
+    def Caja_no_paredes_adyacentes(variables, values):
         cont = 0
-        if values[caja_paredes[0]][0] == 0:
+        if values[0] == 0:
             cont += 1
-        if values[caja_paredes[0]][1] == 0:
+        if values[1] == 0:
             cont += 1
-        if values[caja_paredes[0]][0] == filas-1:
+        if values[0] == filas-1:
             cont += 1
-        if values[caja_paredes[0]][1] == columnas-1:
+        if values[1] == columnas-1:
             cont += 1
         
         # Pregunto si la caja tiene pegada una de las paredes internas
-        for pared in caja_paredes[1]:
-            aux = (values[caja_paredes[0]][0] - 1, values[caja_paredes[0]][1])
-            if aux == values[pared]:
+        for pared in lista_paredes:
+            aux = (values[0] - 1, values[1])
+            if aux == pared:
                 cont += 1
 
-            aux = (values[caja_paredes[0]][0] + 1, values[caja_paredes[0]][1])
-            if aux == values[pared]:
+            aux = (values[0] + 1, values[1])
+            if aux == pared:
                 cont += 1
 
-            aux = (values[caja_paredes[0]][0], values[caja_paredes[0]][1] - 1)
-            if aux == values[pared]:
+            aux = (values[0], values[1] - 1)
+            if aux == pared:
                 cont += 1
                 
-            aux = (values[caja_paredes[0]][0], values[caja_paredes[0]][1] + 1)
-            if aux == values[pared]:
+            aux = (values[0], values[1] + 1)
+            if aux == pared:
                 cont += 1
 
-        if cont >= 2:
-            return False # Si encuentra una caja que tenga 2 o mas paredes, retorna false
+        if cont >= 1:
+            return False # Si encuentra una caja que tenga paredes, retorna false
         
-        return True # Si no encontro caja con 2 o mas paredes, retorna True
+        return True # Si no encontro caja con paredes, retorna True
 
     for c in lista_cajas:
-        restricciones.append(((c, lista_paredes), Caja_no_paredes_adyacentes))
+        restricciones.append((c, Caja_no_paredes_adyacentes))
 
     #--------------------------------------------------------
     problema = CspProblem(variables, dominios, restricciones)
-    result = backtrack(problema)
+    result = backtrack(problema, inference=False, variable_heuristic=MOST_CONSTRAINED_VARIABLE, value_heuristic=LEAST_CONSTRAINING_VALUE,)
     #print('Resultado: ')
     #print(result)
     #result = list(result)
-    result = tuple([tuple(fila) for fila in result])
     solucion_pared = []
     solucion_caja = []
     solucion_objetivo = []
     solucion_player = result['Persona']
+
     for p in lista_paredes:
         solucion_pared.append((result[p]))
     
