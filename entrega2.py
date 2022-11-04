@@ -130,58 +130,56 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     for pa in lista_paredes:
         restricciones.append((('Persona' ,pa), Player_con_CajasParedes))
 
-        #En esta restriccion tira error y no se porque
     def Cajas_en_Objetivos(variables, values):
         for c in lista_cajas:
-            ban = True
-            for o in lista_objetivos:
-                if c == o:
-                    ban = False
-                    break
-            if ban:
+            if c not in lista_objetivos:
                 return True # Si encuentra una caja que no este en los objetivos, entonces no estan todas las cajas en los objetivos
         return False # Si no encuentra una caja que no este en objetivo, entonces todas las cajas estan en objetivos
 
-    restricciones.append(((0, 1), Cajas_en_Objetivos))
+    restricciones.append((variables, Cajas_en_Objetivos))
 
 
     def Caja_no_paredes_adyacentes(variables, values):
-        cont = 0
-        if values[0] == 0:
-            cont += 1
-        if values[1] == 0:
-            cont += 1
-        if values[0] == filas-1:
-            cont += 1
-        if values[1] == columnas-1:
-            cont += 1
-        
-        # Pregunto si la caja tiene pegada una de las paredes internas
-        for pared in lista_paredes:
-            aux = (values[0] - 1, values[1])
-            if aux == pared:
-                cont += 1
-
-            aux = (values[0] + 1, values[1])
-            if aux == pared:
-                cont += 1
-
-            aux = (values[0], values[1] - 1)
-            if aux == pared:
-                cont += 1
+        for caja in lista_cajas:
+            cont = 0
+            for i, v in enumerate(variables):
+                if v == caja:
+                    if values[i][0] == 0:
+                        cont += 1
+                    if values[i][1] == 0:
+                        cont += 1
+                    if values[i][0] == filas-1:
+                        cont += 1
+                    if values[i][1] == columnas-1:
+                        cont += 1
+                    
+                    # Pregunto si la caja tiene pegada una de las paredes internas
+                    for pared in lista_paredes:
+                        aux = (values[i][0] - 1, values[i][1])
+                        print(aux)
+                        if aux == pared:
+                            cont += 1
+                        
+                        aux = (values[i][0] + 1, values[i][1])
+                        if aux == pared:
+                            cont += 1
+                        
+                        aux = (values[i][0], values[i][1] - 1)
+                        if aux == pared:
+                            cont += 1
+                            
+                        aux = (values[i][0], values[i][1] + 1)
+                        if aux == pared:
+                            cont += 1
+                    
+                    if cont >= 1:
+                        return False # Si encuentra una caja que tenga paredes, retorna false
                 
-            aux = (values[0], values[1] + 1)
-            if aux == pared:
-                cont += 1
-
-        if cont >= 1:
-            return False # Si encuentra una caja que tenga paredes, retorna false
-        
         return True # Si no encontro caja con paredes, retorna True
 
-    for c in lista_cajas:
-        restricciones.append((c, Caja_no_paredes_adyacentes))
+    restricciones.append((variables, Caja_no_paredes_adyacentes))
 
+    
     #--------------------------------------------------------
     problema = CspProblem(variables, dominios, restricciones)
     result = backtrack(problema, inference=False, variable_heuristic=MOST_CONSTRAINED_VARIABLE, value_heuristic=LEAST_CONSTRAINING_VALUE,)
