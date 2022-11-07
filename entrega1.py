@@ -24,13 +24,6 @@ from simpleai.search.viewers import WebViewer, BaseViewer
 #    50
 #)
 
-#initial = (
-#    (2, 3),
-#    ((2, 2),),
-#    ((3, 5), (4, 1), (5, 4), (6, 3), (7, 4), (6, 6)),
-#    50
-#)
-
 def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
     
     cajas_acomodar = []
@@ -199,17 +192,9 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
 
             return len(lista_cajas)
 
-    #------------------------------------
-    #Ejecutar esto para probar el actions:
-    #  from entrega1 import Socoban, initial, obstaculos
-    #  problem = Socoban(None)
-    #  problem.actions(initial)
-    #------------------------------------
-
-    #viewer = WebViewer()
+    #----------------------------------------------------
     problema = Socoban(INITIAL)
-    resultado = astar(problema) #, viewer=viewer)
-    #resultado = breadth_first(problema)
+    resultado = astar(problema, graph_search=True)
 
     solucion = []
     for action, state in resultado.path():
@@ -217,15 +202,4 @@ def jugar(paredes, cajas, objetivos, jugador, maximos_movimientos):
             solucion.append(action[1])
 
     return solucion
-
-'''
-if __name__ == '__main__':
-    obstaculos = [(4, 0), (4, 3), (4, 6), (0, 2), (0, 5), (1, 0), (1, 6), (4, 2), (3, 0), (4, 5), (3, 6), (0, 1), (0, 4), (4, 1), (4, 4), (0, 0), (0, 3), (2, 0), (0, 6), (2, 6)]
-    cajas = [(2, 3)]
-    objetivo = [(2, 2)]  
-    jugador = (2, 4)
-    maximos_movimientos = 30
-    
-    secuencia = jugar(obstaculos, cajas, objetivo, jugador, maximos_movimientos)
-    print(secuencia)
-'''
+    #----------------------------------------------------

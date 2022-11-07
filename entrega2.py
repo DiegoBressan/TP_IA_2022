@@ -12,12 +12,6 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     cajas = cantidad_cajas_objetivos
     objetivos = cantidad_cajas_objetivos
 
-    #filas = 3
-    #columnas = 3
-    #paredes = 1
-    #cajas = 1
-    #objetivos = 1
-
     # Consideramos como variables a las paredes cajas y objetivos que debemos colocar
     variables = []
     lista_paredes = []
@@ -67,7 +61,13 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
 
     # Genero la lista restricciones y las restricciones
     restricciones = []
-    
+
+    # Funcion que utilizamos en la ultima restriccion, que guarda las posiciones de la grilla
+    grilla = []
+    for x in range(filas):
+        for y in range(columnas):
+            grilla.append((x, y))
+
     def Paredes_con_Paredes(variables, values): # Que no hayan paredes en la misma posicion
         p1, p2 = values
         if p1 != p2:
@@ -138,54 +138,47 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
 
     restricciones.append((variables, Cajas_en_Objetivos))
 
+    def Caja_no_paredes_adyacentes(variables, values): # Que las cajas no tengan paredes adyacentes si estan en el borde, y si no estan en el borde pueden tener 1 o menos
+        caja = values[0]
+        fila_caja, columna_caja = caja
+        c = 0
 
-    def Caja_no_paredes_adyacentes(variables, values):
-        for caja in lista_cajas:
-            cont = 0
-            for i, v in enumerate(variables):
-                if v == caja:
-                    if values[i][0] == 0:
-                        cont += 1
-                    if values[i][1] == 0:
-                        cont += 1
-                    if values[i][0] == filas-1:
-                        cont += 1
-                    if values[i][1] == columnas-1:
-                        cont += 1
-                    
-                    # Pregunto si la caja tiene pegada una de las paredes internas
-                    for pared in lista_paredes:
-                        aux = (values[i][0] - 1, values[i][1])
-                        print(aux)
-                        if aux == pared:
-                            cont += 1
-                        
-                        aux = (values[i][0] + 1, values[i][1])
-                        if aux == pared:
-                            cont += 1
-                        
-                        aux = (values[i][0], values[i][1] - 1)
-                        if aux == pared:
-                            cont += 1
-                            
-                        aux = (values[i][0], values[i][1] + 1)
-                        if aux == pared:
-                            cont += 1
-                    
-                    if cont >= 1:
-                        return False # Si encuentra una caja que tenga paredes, retorna false
-                
-        return True # Si no encontro caja con paredes, retorna True
+        posiciones_adyacentes = []
+        if (fila_caja + 1, columna_caja) in grilla:
+            posiciones_adyacentes.append((fila_caja + 1, columna_caja))
+        if (fila_caja - 1, columna_caja) in grilla:
+            posiciones_adyacentes.append((fila_caja - 1, columna_caja))
+        if (fila_caja, columna_caja + 1) in grilla:
+            posiciones_adyacentes.append((fila_caja, columna_caja + 1))
+        if (fila_caja, columna_caja - 1) in grilla:
+            posiciones_adyacentes.append((fila_caja, columna_caja - 1))
 
-    restricciones.append((variables, Caja_no_paredes_adyacentes))
+        for posicion in values:
+            if posicion in posiciones_adyacentes:
+                c += 1
+
+        if (fila_caja == 0) or (fila_caja == filas) or (columna_caja == 0) or (columna_caja == columnas): # Si la caja esta en el borde
+            if c == 0: # Si NO tiene ninguna pared adyacente
+                return True
+        else: # Si NO está en el borde
+            if c <= 1: # Si tiene MÍNIMO 1 pared adyacente
+                return True
+        
+        return False
+
+    if len(lista_paredes) > 1: # Pregunto cuantas paredes hay, y si hay mas de una, tomo por cada caja, combinaciones de 2 predes.
+        for c in lista_cajas:    
+            for p1, p2 in combinations(lista_paredes, 2):          
+                restricciones.append(((c, p1, p2), Caja_no_paredes_adyacentes))
+    else: # Sino , por cada caja, consulto por la unica pared
+        p1 = lista_paredes[0]
+        for c in lista_cajas: 
+            restricciones.append(((c, p1), Caja_no_paredes_adyacentes))
 
     
     #--------------------------------------------------------
     problema = CspProblem(variables, dominios, restricciones)
     result = backtrack(problema, inference=False, variable_heuristic=MOST_CONSTRAINED_VARIABLE, value_heuristic=LEAST_CONSTRAINING_VALUE,)
-    #print('Resultado: ')
-    #print(result)
-    #result = list(result)
     solucion_pared = []
     solucion_caja = []
     solucion_objetivo = []
@@ -200,17 +193,5 @@ def armar_mapa(filas, columnas, cantidad_paredes, cantidad_cajas_objetivos):
     for o in lista_objetivos:
         solucion_objetivo.append((result[o]))
     
-    solucion = (
-        solucion_pared,
-        solucion_caja,
-        solucion_objetivo,
-        solucion_player
-    )
-    solucion = tuple(solucion)
-    return solucion
+    return (solucion_pared, solucion_caja, solucion_objetivo, solucion_player)
     #--------------------------------------------------------
-
-    #print(variables)
-    #print(dominios)
-    #print(lista_grilla)
-    #print(nuevalista)
